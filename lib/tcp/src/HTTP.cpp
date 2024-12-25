@@ -7,10 +7,6 @@ using namespace std;
     Request_StartLine::Request_StartLine() {}
     Request_StartLine::~Request_StartLine() {}
 
-    string Request_StartLine::getMethod() const { return method; }
-    string Request_StartLine::getTarget() const { return target; }
-    string Request_StartLine::getVersion() const { return version; }
-
     bool Request_StartLine::setStartLine(string startLine) {
         if(startLine.empty()) return false;
 
@@ -22,20 +18,20 @@ using namespace std;
         if(method.empty() || target.empty() || version.empty()) return false;
 
         this->method = method;
-        this->target = target;
+        this->target = (target == "/") ? "/index.html" : target;
         this->version = version;
 
         return true;
     }
+
+    string Request_StartLine::getMethod() const { return method; }
+    string Request_StartLine::getTarget() const { return target; }
+    string Request_StartLine::getVersion() const { return version; }
+
 #pragma endregion
 
-#pragma region Response_StartLine
-    Response_StartLine::Response_StartLine() 
-        : version("HTTP/1.1"), status(StatusCode::OK), reason("OK") {}
-
-    void Response_StartLine::setVersion(string ver) { version = ver; }
-
-    void Response_StartLine::setStatus(StatusCode code) {
+#pragma region Response_StatusLine
+    void Response_StatusLine::setStatus(StatusCode code) {
         status = code;
         switch(code) {
             case StatusCode::OK: reason = "OK"; break;
@@ -48,9 +44,7 @@ using namespace std;
         }
     }
 
-    void Response_StartLine::setReason(string msg) { reason = msg; }
-
-    string Response_StartLine::getStartLine() const {
+    string Response_StatusLine::getStartLine() const {
         return version + " " + to_string(static_cast<int>(status)) + " " + reason;
     }
 #pragma endregion
@@ -68,10 +62,6 @@ using namespace std;
 
     bool Headers::hasHeader(const string& key) const {
         return headers.find(key) != headers.end();
-    }
-
-    string Headers::getContentType() const {
-        return getHeader("Content-Type");
     }
 
     const map<string, string>& Headers::getAllHeaders() const {
@@ -144,6 +134,11 @@ using namespace std;
 
         return true;
     }
+
+    Request_StartLine HTTP_Request::getStartLine() const { 
+        return this->startLine; 
+    }
+
 #pragma endregion
 
 #pragma region HTTP_Response
@@ -152,9 +147,8 @@ using namespace std;
     }
 
     void HTTP_Response::setStatus(StatusCode code) {
-        startLine.setStatus(code);
+        statusLine.setStatus(code);
         
-        // 기본 에러 메시지 설정
         if(code >= StatusCode::BAD_REQUEST) {
             string errorBody = "<html><body><h1>" + 
                             to_string(static_cast<int>(code)) + " " +
@@ -173,8 +167,8 @@ using namespace std;
         headers.addHeader("Content-Type", type);
     }
 
-    string HTTP_Response::buildResponse() {
-        string response = startLine.getStartLine() + "\r\n";
+    string HTTP_Response::buildResponse () {
+        string response = statusLine.getStartLine() + "\r\n";
         
         // 헤더 추가
         for(const auto& header : headers.getAllHeaders()) {
@@ -195,7 +189,28 @@ using namespace std;
     bool HTTP::setRequest(string & buffer) {
         if(buffer.empty()) return false;
 
-        this->request.setRequest(buffer);
+        if(!this->request.setRequest(buffer)) {
+            return false;
+        }
+
+        // 메서드 존재 여부 확인
+        string method = request.getStartLine().getMethod();
+        if(this->methodMap.find(method) == this->methodMap.end()) {
+            response.setStatus(StatusCode::BAD_REQUEST);
+            return false;
+        }
+
+        // 메서드 핸들러 실행
+        if(this->methodMap[method](*this)) {
+            response.setStatus(StatusCode::INTERNAL_SERVER_ERROR);
+            return false;
+        }
+
+        response.setStatus(StatusCode::OK);  // 기본 상태 코드 설정
         return true;
+    }
+
+    string HTTP::getResponse() {
+        return this->response.buildResponse();
     }
 #pragma endregion

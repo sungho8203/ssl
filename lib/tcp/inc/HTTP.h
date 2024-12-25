@@ -15,29 +15,32 @@ private:
     string version;
 
 public:
-    map<string, int (*)()> methodMap;
-
     Request_StartLine();
     ~Request_StartLine();
+    
     bool setStartLine(string startLine);
+    
     string getMethod() const;
     string getTarget() const;
     string getVersion() const;
 };
 
-class Response_StartLine {
+
+class Response_StatusLine {
 private:
     string version;
     StatusCode status;
     string reason;
 
 public:
-    Response_StartLine();
-    void setVersion(string ver);
+    Response_StatusLine() : version("HTTP/1.1") {}
+    
+    void setVersion(string ver){version = ver;}
     void setStatus(StatusCode code);
-    void setReason(string msg);
+    
     string getStartLine() const;
 };
+
 
 class Headers {
 private:
@@ -53,6 +56,7 @@ public:
     bool removeHeader(const string& key);
 };
 
+
 class Body {
 private:
     string body;
@@ -62,6 +66,7 @@ public:
     string getBody() const;
 };
 
+
 class HTTP_Request {
 private:
     Request_StartLine startLine;
@@ -70,15 +75,13 @@ private:
 
 public:
     bool setRequest(string & request);
-    string getPath() const {
-        string target = startLine.getTarget();
-        return target == "/" ? "/index.html" : target;
-    }
+    Request_StartLine getStartLine() const;
 };
+
 
 class HTTP_Response {
 private:
-    Response_StartLine startLine;
+    Response_StatusLine statusLine;
     Headers headers;
     Body body;
 
@@ -87,16 +90,20 @@ public:
     void setStatus(StatusCode code);
     void setBody(const string& content);
     void setContentType(const string& type);
-    string buildResponse();
+
+    string buildResponse ();
 };
+
 
 class HTTP{
 private:
     HTTP_Request request;
     HTTP_Response response;
 public:
+    map<string, int (*)(const HTTP &http)> methodMap;
+
     bool setRequest(string & buffer);
-    const HTTP_Request& getRequest() const { return request; }
+    string getResponse();
 };
 
 #endif

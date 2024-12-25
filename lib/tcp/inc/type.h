@@ -11,4 +11,14 @@ enum class StatusCode {
     INTERNAL_SERVER_ERROR = 500
 };
 
+enum class HTTP_ErrorCodes{
+    requestErrorCode = 100,
+    FAIL_SetRequest = 101,
+
+    responseErrorCode = 200,
+    FAIL_SetStatus = 201,
+    FAIL_SetContentType = 202,
+    FAIL_SetBody = 203,
+};
+
 #endif
