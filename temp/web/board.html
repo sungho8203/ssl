@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Board</title>
+    <link rel="stylesheet" href="board.css">
+</head>
+<body>
+    <div class="container">
+        <h1>게시판</h1>
+        
+        <!-- 글쓰기 버튼 -->
+        <div class="write-btn-container">
+            <button id="writeBtn">글쓰기</button>
+        </div>
+
+        <!-- 게시글 목록 -->
+        <div class="board-list">
+            <div class="board-header">
+                <span class="col-id">번호</span>
+                <span class="col-title">제목</span>
+                <span class="col-author">작성자</span>
+                <span class="col-date">작성일</span>
+            </div>
+            <div id="posts">
+                <!-- 자바스크립트로 동적 추가됨 -->
+            </div>
+        </div>
+
+        <!-- 글쓰기 모달 -->
+        <div id="writeModal" class="modal">
+            <div class="modal-content">
+                <h2>글쓰기</h2>
+                <input type="text" id="postTitle" placeholder="제목">
+                <input type="text" id="postAuthor" placeholder="작성자">
+                <textarea id="postContent" placeholder="내용"></textarea>
+                <div class="button-group">
+                    <button id="submitPost">등록</button>
+                    <button id="cancelPost">취소</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="board.js"></script>
+</body>
+</html> 

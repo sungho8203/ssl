@@ -18,7 +18,7 @@ using namespace std;
         if(method.empty() || target.empty() || version.empty()) return false;
 
         this->method = method;
-        this->target = (target == "/") ? "/index.html" : target;
+        this->target = (target == "/") ? "/board.html" : target;
         this->version = version;
 
         return true;
@@ -186,7 +186,7 @@ using namespace std;
 #pragma endregion
 
 #pragma region HTTP
-    bool HTTP::setRequest(string & buffer) {
+    bool HTTP::setRequest(string buffer) {
         if(buffer.empty()) return false;
 
         if(!this->request.setRequest(buffer)) {

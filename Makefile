@@ -1,27 +1,26 @@
 CXX = g++
-CXXFLAGS = -std=c++11 -Wall
-INCLUDES = -I../lib/tcp/inc -I.
+CXXFLAGS = -std=c++11 -Wall -g
+INCLUDES = -Ilib/tcp/inc
 
 # 디렉토리 설정
 BUILD_DIR = build
-SRC_DIR = .
-LIB_SRC_DIR = ../lib/tcp/src
+SRC_DIRS = temp lib/tcp/src
+TARGET = server
 
 # 소스 파일들
-SRCS = $(SRC_DIR)/test.cpp $(LIB_SRC_DIR)/HTTP.cpp $(LIB_SRC_DIR)/tcp.cpp
+SRCS = $(wildcard temp/*.cpp) $(wildcard lib/tcp/src/*.cpp)
 OBJS = $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
-TARGET = $(BUILD_DIR)/test
 
 # 헤더 파일들
-HEADERS = ../lib/tcp/inc/HTTP.h ../lib/tcp/inc/type.h
+HEADERS = $(wildcard lib/tcp/inc/*.h)
 
 # 기본 타겟
 all: mkdir_build $(TARGET)
 
 # 빌드 디렉토리 생성
 mkdir_build:
-	@mkdir -p $(BUILD_DIR)
-	@mkdir -p $(BUILD_DIR)/$(LIB_SRC_DIR)
+	@mkdir -p $(BUILD_DIR)/temp
+	@mkdir -p $(BUILD_DIR)/lib/tcp/src
 
 # 실행 파일 생성
 $(TARGET): $(OBJS)
@@ -34,10 +33,14 @@ $(BUILD_DIR)/%.o: %.cpp $(HEADERS)
 
 # 청소
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(BUILD_DIR) $(TARGET)
 
-# 빌드 및 실행
+# 실행
 run: $(TARGET)
 	./$(TARGET)
 
-.PHONY: all clean run mkdir_build
+# 디버깅
+debug: $(TARGET)
+	gdb ./$(TARGET)
+
+.PHONY: all clean run debug mkdir_build 

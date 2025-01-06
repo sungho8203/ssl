@@ -90,6 +90,10 @@ public:
     void setStatus(StatusCode code);
     void setBody(const string& content);
     void setContentType(const string& type);
+   
+    void setHeader(const string& key, const string& value){
+        this->headers.addHeader(key, value);
+    };
 
     string buildResponse ();
 };
@@ -100,10 +104,13 @@ private:
     HTTP_Request request;
     HTTP_Response response;
 public:
-    map<string, int (*)(const HTTP &http)> methodMap;
+    map<string, int (*)(HTTP &http)> methodMap;
 
-    bool setRequest(string & buffer);
+    bool setRequest(string buffer);
     string getResponse();
+
+    HTTP_Request& getRequest()  { return request; }
+    HTTP_Response& setResponse() { return response; }
 };
 
 #endif

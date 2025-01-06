@@ -11,27 +11,25 @@ using namespace std;
 
 class TCP {
 private:
-    int sockfd;
-    int client_sockfd;
-    string ip;
-    int port;
-    struct sockaddr_in server_addr;
-    bool is_connected;
-    bool is_server;
+    int server_fd;        // 서버 소켓
+    int client_fd;        // 클라이언트 소켓
+    int port;            // 포트 번호
+    struct sockaddr_in server_addr;  // 서버 주소
+    bool is_connected;   // 클라이언트 연결 상태
 
 public:
-    TCP(const string& ip, int port, bool server = false);
+    // 서버 생성 (포트만 필요)
+    TCP(int port);
     ~TCP();
 
-    bool bind_and_listen();
-    bool accept_client();
-    bool connect();
-    bool disconnect();
-    bool send(const string& data);
-    string receive(int buffer_size = 1024);
+    // 서버 기능
+    bool bind_and_listen();  // 서버 시작
+    bool accept_client();    // 클라이언트 연결 수락
+    bool disconnect();       // 클라이언트 연결 종료
+    bool send(const string& data);  // 데이터 전송
+    string receive(int buffer_size = 1024);  // 데이터 수신
     
     bool isConnected() const { return is_connected; }
-    int getSocket() const { return is_server ? client_sockfd : sockfd; }
 };
 
 #endif 
