@@ -9,27 +9,51 @@
 
 using namespace std;
 
-class TCP {
+class Client {
 private:
-    int server_fd;        // 서버 소켓
-    int client_fd;        // 클라이언트 소켓
-    int port;            // 포트 번호
-    struct sockaddr_in server_addr;  // 서버 주소
-    bool is_connected;   // 클라이언트 연결 상태
+    int fd;
+    bool is_connected;
 
 public:
-    // 서버 생성 (포트만 필요)
+    Client(int socket_fd);
+    ~Client();
+
+    bool disconnect();
+    bool send(const string& data);
+    string receive(int buffer_size = 1024);
+    bool isConnected() const;
+};
+
+class Server {
+private:
+    int fd;
+    int port;
+    struct sockaddr_in addr;
+
+public:
+    Server(int port);
+    ~Server();
+
+    bool bind_and_listen();
+    Client* accept_client();
+};
+
+class TCP {
+private:
+    Server* server;
+    Client* client;
+
+public:
     TCP(int port);
     ~TCP();
 
-    // 서버 기능
-    bool bind_and_listen();  // 서버 시작
-    bool accept_client();    // 클라이언트 연결 수락
-    bool disconnect();       // 클라이언트 연결 종료
-    bool send(const string& data);  // 데이터 전송
-    string receive(int buffer_size = 1024);  // 데이터 수신
-    
-    bool isConnected() const { return is_connected; }
+    bool bind_and_listen();
+    bool accept_client();
+    bool send(const string& data);
+    string receive(int buffer_size = 1024);
+    bool disconnect();
+
+    Client* getClient();
 };
 
-#endif 
+#endif

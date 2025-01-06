@@ -104,7 +104,7 @@ private:
     HTTP_Request request;
     HTTP_Response response;
 public:
-    map<string, int (*)(HTTP &http)> methodMap;
+    static map<string, int (*)(HTTP &http)> methodMap;
 
     bool setRequest(string buffer);
     string getResponse();

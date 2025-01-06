@@ -3,6 +3,9 @@
 
 using namespace std;
 
+// static 멤버 변수 정의
+map<string, int (*)(HTTP &http)> HTTP::methodMap;
+
 #pragma region Request_StartLine
     Request_StartLine::Request_StartLine() {}
     Request_StartLine::~Request_StartLine() {}

@@ -51,25 +51,26 @@ int getMethod(HTTP& http){
 }
 
 // 클라이언트 요청 처리 함수
-void handleClient(TCP* tcp, HTTP* http) {
-    string received = tcp->receive();
+void handleClient(Client *client) {
+    HTTP http;
+
+    string received = client->receive();
     cout << "Received request:" << endl << received << endl;
 
-    bool isSet = http->setRequest(received);
+    bool isSet = http.setRequest(received);
     if(!isSet) cout << "error" << endl;
     
-    string response = http->getResponse();
+    string response = http.getResponse();
     cout << "Sending response..." << endl;
-    tcp->send(response);
+    client->send(response);
     
-    tcp->disconnect();
+    client->disconnect();
 }
 
 int main(){
     TCP server(8080);
-    HTTP http;
-
-    http.methodMap["GET"] = getMethod;
+    Client *client = nullptr;
+    HTTP::methodMap["GET"] = getMethod;
     server.bind_and_listen();
 
     while(true){
@@ -79,9 +80,10 @@ int main(){
             continue;
         }
         cout << "Client connected" << endl;
+        client = server.getClient();
 
         // 새로운 쓰레드 생성하여 클라이언트 처리
-        thread(handleClient, &server, &http).detach();
+        thread(handleClient, client).detach();
     }
 
     return 0;
