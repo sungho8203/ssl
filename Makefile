@@ -1,15 +1,15 @@
 CXX = g++
 CXXFLAGS = -std=c++11 -Wall -g
-LDFLAGS =
-INCLUDES = -Ilib/tcp/inc
+LDFLAGS = -lmysqlcppconn
+INCLUDES = -Ilib/tcp/inc -Ilib/database/inc
 
 # 디렉토리 설정
 BUILD_DIR = build
-SRC_DIRS = temp lib/tcp/src
+SRC_DIRS = temp lib/tcp/src lib/database/src
 TARGET = $(BUILD_DIR)/server
 
 # 소스 파일들
-SRCS = $(wildcard temp/*.cpp) $(wildcard lib/tcp/src/*.cpp)
+SRCS = $(wildcard temp/*.cpp) $(wildcard lib/tcp/src/*.cpp) $(wildcard lib/database/src/*.cpp)
 OBJS = $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
 
 # 헤더 파일들
@@ -31,6 +31,7 @@ release: $(TARGET)
 mkdir_build:
 	@mkdir -p $(BUILD_DIR)/temp
 	@mkdir -p $(BUILD_DIR)/lib/tcp/src
+	@mkdir -p $(BUILD_DIR)/lib/database/src
 
 # 실행 파일 생성
 $(TARGET): mkdir_build $(OBJS)
@@ -52,5 +53,9 @@ run: release
 # 디버깅
 debug_run: debug
 	gdb ./$(TARGET)
+
+# 서버 백그라운드 실행용 타겟
+nohup_run: release
+	nohup $(BUILD_DIR)/server > server.log 2>&1 &
 
 .PHONY: all clean run debug release debug_run mkdir_build

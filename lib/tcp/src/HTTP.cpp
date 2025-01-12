@@ -142,6 +142,14 @@ map<string, int (*)(HTTP &http)> HTTP::methodMap;
         return this->startLine; 
     }
 
+    Headers HTTP_Request::getHeaders() const {
+        return this->headers;
+    }
+
+    Body HTTP_Request::getBody() const {
+        return this->body;
+    }
+
 #pragma endregion
 
 #pragma region HTTP_Response

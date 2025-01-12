@@ -76,6 +76,8 @@ private:
 public:
     bool setRequest(string & request);
     Request_StartLine getStartLine() const;
+    Headers getHeaders() const;
+    Body getBody() const;
 };
 
 
